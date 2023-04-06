@@ -2,9 +2,9 @@
 	<div>
 		<nav class="navbar">
 			<div class="navbar__links">
-				<a href="/linked-list">Linked List</a>
-				<!-- <a href="/stack">Stack</a>
-				<a href="/queue">Queue</a>
+				<a href="/">Linked List</a>
+				<a href="/stack">Stack</a>
+				<!-- <a href="/queue">Queue</a>
 				<a href="/binary-search-tree">Binary Search Tree</a>
 				<a href="/heap">Heap</a>
 				<a href="/graph">Graph</a> -->

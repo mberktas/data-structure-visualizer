@@ -20,6 +20,8 @@ html {
 	--headNodeColor: #67f067;
 	--travelingNodeColor: #62ffa2;
 	--arrowBorderWidth: 6px;
+	--cubeHeight: 0px;
+	--cubeWidth: 32px;
 }
 
 .linked-list {

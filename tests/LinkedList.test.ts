@@ -2,10 +2,8 @@ import { describe, expect, test } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils'
 import { LinkedList, Node } from '../data_structures/LinkedList'
 
-describe('My test', async () => {
-	await setup({
-		// test context options
-	})
+describe('LinkedList', async () => {
+	await setup({})
 
 	test('should create linkedlist', () => {
 		const linkedList = new LinkedList()
