@@ -1,7 +1,7 @@
 <template>
 	<div class="arrow">
-		<div class="arrow__line" :index="index"></div>
-		<div class="arrow__triangle" :index="index"></div>
+		<div class="arrow__line" :index="index" ref="arrowLine"></div>
+		<div class="arrow__triangle" :index="index" ref="arrowTriangle"></div>
 	</div>
 </template>
 
@@ -10,27 +10,24 @@ const props = defineProps<{
 	index: number
 }>()
 
-let arrowLineEl: HTMLElement | null, arrowTriangleEl: HTMLElement | null
+const arrowLine = ref<HTMLElement>()
+const arrowTriangle = ref<HTMLElement>()
 
-onMounted(() => {
-	arrowLineEl = document.querySelector(`.arrow__line[index="${props.index}"]`)
-	arrowTriangleEl = document.querySelector(`.arrow__triangle[index="${props.index}"]`)
-})
+const arrowLineAnimationClass = 'arrow__line-color-change'
+const arrowTriangleAnimationClass = 'arrow__triangle-color-change'
 
 const playAnimation = () => {
-	console.log('claistii', arrowLineEl)
-	arrowLineEl!.classList.add('arrow__line-color-change')
-	arrowTriangleEl!.classList.add('arrow__triangle-color-change')
+	arrowLine.value!.classList.add(arrowLineAnimationClass)
+	arrowTriangle.value!.classList.add(arrowTriangleAnimationClass)
 }
 
 const stopAnimation = () => {
-	const arrowLineEl = document.querySelector(`.arrow__line[index="${props.index}"]`)
-	arrowLineEl?.classList.remove('arrow-line-color-change')
+	arrowLine.value!.classList.remove(arrowLineAnimationClass)
 }
 
 const clearAnimation = () => {
-	arrowLineEl!.classList.remove('arrow__line-color-change')
-	arrowTriangleEl!.classList.remove('arrow__triangle-color-change')
+	arrowLine.value!.classList.remove(arrowLineAnimationClass)
+	arrowTriangle.value!.classList.remove(arrowTriangleAnimationClass)
 }
 
 defineExpose({

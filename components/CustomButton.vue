@@ -1,19 +1,31 @@
 <template>
-	<button ref="button"><slot></slot></button>
+	<button ref="button" @click="btnDelay"><slot></slot></button>
 </template>
 
 <script setup lang="ts">
 const button = ref<HTMLButtonElement | null>(null)
-let clickDelay = 200
 
-onMounted(() => {
-	button.value!.addEventListener('click', () => {
-		button.value!.disabled = true
-		setTimeout(() => {
-			button.value!.disabled = false
-		}, clickDelay)
-	})
+const props = defineProps({
+	multiClickable: {
+		type: Boolean,
+		default: false,
+	},
+
+	delay: {
+		type: Number,
+		default: 200,
+	},
 })
+
+const btnDelay = () => {
+	if (props.multiClickable) {
+		return
+	}
+	button.value!.disabled = true
+	setTimeout(() => {
+		button.value!.disabled = false
+	}, props.delay)
+}
 </script>
 
 <style scoped>
@@ -25,7 +37,7 @@ button {
 	background-color: burlywood;
 	color: #fff;
 	cursor: pointer;
-	min-width: fit-content;
+	min-width: max-content;
 	height: fit-content;
 }
 </style>

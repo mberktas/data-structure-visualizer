@@ -1,5 +1,5 @@
 <template>
-	<div class="node" :class="type" :index="index">
+	<div class="node" :class="type" :index="index" ref="nodeEl">
 		<div class="node__value">{{ node.data }}</div>
 	</div>
 </template>
@@ -23,20 +23,32 @@ const props = defineProps({
 	},
 })
 
-let nodeEl: HTMLElement | null
-onMounted(() => {
-	nodeEl = document.querySelector(`.node[index="${props.index}"]`)
-})
+let nodeEl = ref<HTMLElement>()
+
+const nodeColorChangeAnimationClass = 'color-changing'
+const nodeFoundAnimationClass = 'node--found'
+
+const playAnimation = () => {
+	nodeEl.value?.classList.add(nodeColorChangeAnimationClass)
+}
+
+const playFoundAnimation = () => {
+	nodeEl.value?.classList.add(nodeFoundAnimationClass)
+}
+const stopAnimation = () => {
+	nodeEl.value?.classList.remove(...[nodeColorChangeAnimationClass, nodeFoundAnimationClass])
+}
 
 const clearAnimation = () => {
-	console.log('node clear')
-	console.log(nodeEl)
-	nodeEl?.classList.remove('color-changing')
-	nodeEl?.classList.remove('node--found')
+	nodeEl.value?.classList.remove(...[nodeColorChangeAnimationClass, nodeFoundAnimationClass])
 }
 
 defineExpose({
+	playAnimation,
+	playFoundAnimation,
+	stopAnimation,
 	clearAnimation,
+	props,
 })
 </script>
 

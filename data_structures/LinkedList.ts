@@ -1,13 +1,13 @@
-export class LinkedList {
-	head: Node | null
-	tail: Node | null
+export class LinkedList<T> {
+	head: Node<T> | null
+	tail: Node<T> | null
 
 	constructor() {
 		this.head = null
 		this.tail = null
 	}
 
-	push(node: Node) {
+	push(node: Node<T>) {
 		if (this.head === null) {
 			this.head = node
 			this.tail = node
@@ -17,7 +17,7 @@ export class LinkedList {
 		}
 	}
 
-	pop(): Node | null {
+	pop(): Node<T> | null {
 		if (this.head === null) {
 			return null
 		}
@@ -69,7 +69,7 @@ export class LinkedList {
 		}
 	}
 
-	getNodes(): Node[] {
+	getNodes(): Node<T>[] {
 		const nodes = []
 		let node = this.head
 		while (node !== null) {
@@ -80,9 +80,9 @@ export class LinkedList {
 	}
 }
 
-export class Node {
-	data: any
-	next: Node | null
+export class Node<T> {
+	data: T
+	next: Node<T> | null
 
 	constructor(data: any) {
 		this.data = data

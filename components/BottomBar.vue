@@ -23,7 +23,7 @@
 	width: auto;
 	overflow-x: auto;
 	min-height: 85px;
-	max-height: 100px;
+	max-height: 250px;
 }
 
 /* .bottom-bar__placeholder {

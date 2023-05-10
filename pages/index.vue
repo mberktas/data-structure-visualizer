@@ -7,25 +7,31 @@
 					:type="nodeType(index)"
 					:data="node.data"
 					:index="index"
-					:ref="(el) => setNodeRefs(el, index)"
+					ref="nodeRefs"
 				/>
 
 				<Transition name="node__next">
 					<div class="node__next" v-if="node.next != null">
-						<Arrow :ref="(el) => setArrowRefs(el, index)" :index="index" :order="index" />
+						<Arrow ref="arrowRefs" :index="index" :order="index" />
 					</div>
 				</Transition>
 			</div>
 		</TransitionGroup>
 	</div>
 	<BottomBar>
-		<input style="width: 100px" placeholder="Node" type="text" v-model="nodeData" />
-		<CustomButton @click="generateList">Random List</CustomButton>
-		<CustomButton @click="addNode">Add node</CustomButton>
-		<CustomButton @click="randomNode">Random node</CustomButton>
-		<CustomButton @click="popNode" :disabled="disablePopButton">Pop node</CustomButton>
-		<CustomButton @click="removeNode">Remove Node</CustomButton>
-		<CustomButton @click="clearList">Clear List</CustomButton>
+		<div class="btn__group">
+			<input style="width: 100px" placeholder="Node" type="text" v-model="nodeData" />
+			<CustomButton @click="addNode">Add node</CustomButton>
+			<CustomButton @click="removeNode">Remove Node</CustomButton>
+		</div>
+		<div class="btn__group">
+			<CustomButton @click="randomNode">Random node</CustomButton>
+			<CustomButton @click="popNode">Pop node</CustomButton>
+		</div>
+		<div class="btn__group">
+			<CustomButton @click="generateList">Random List</CustomButton>
+			<CustomButton @click="clearList">Clear List</CustomButton>
+		</div>
 	</BottomBar>
 </template>
 
@@ -34,52 +40,30 @@ import { LinkedList, Node } from '@/data_structures/LinkedList'
 
 const linkedList = ref(new LinkedList())
 
-const nodes = ref(linkedList.value.getNodes())
+let nodes = computed(() => linkedList.value.getNodes())
 
 const nodeData = ref()
 
-const arrows = ref<any[]>([])
-
-const setArrowRefs = (el: any, index: number) => {
-	arrows.value[index] = el
-}
+const arrowRefs = ref<any[]>([])
 
 const nodeRefs = ref<any[]>([])
 
-const setNodeRefs = (el: any, index: number) => {
-	nodeRefs.value[index] = el
-}
-
 const removeNode = async () => {
-	let order = 0
-	while (true) {
-		if (order === nodes.value.length) break
+	for (let nodeEl of nodeRefs.value) {
+		const nodeElData = nodeEl.props.node.data
 
-		const wrapperEl = document.querySelector(`.wrapper[order='${order}']`)
-		const nodeEl = wrapperEl?.firstElementChild
-		const nodeElData = nodeEl?.attributes.getNamedItem('data')?.value
-
-		nodeEl!.classList.add('color-changing')
+		nodeEl.playAnimation()
 
 		if (nodeElData == nodeData.value) {
-			nodeEl!.classList.remove('color-changing')
-			nodeEl!.classList.add('node--found')
-			console.log('found')
-			await new Promise((resolve) => {
-				setTimeout(() => {
-					linkedList.value.removeNodeByData(nodeData.value)
-					resolve('')
-				}, 2000)
-			})
+			nodeEl.stopAnimation()
+			nodeEl.playFoundAnimation()
+			await new Promise((resolve) => setTimeout(resolve, 1000))
+			linkedList.value.removeNodeByData(nodeData.value)
 			break
 		}
 
-		if (arrows.value[order]) {
-			arrows.value[order].playAnimation()
-		}
-
-		order++
-
+		await new Promise((resolve) => setTimeout(resolve, 1000))
+		if (arrowRefs.value[nodeEl.props.index]) arrowRefs.value[nodeEl.props.index].playAnimation()
 		await new Promise((resolve) => setTimeout(resolve, 1000))
 	}
 
@@ -87,74 +71,51 @@ const removeNode = async () => {
 }
 
 const clearAnimation = () => {
-	arrows.value.forEach((arrow) => {
+	arrowRefs.value.forEach((arrow) => {
 		if (arrow) arrow.clearAnimation()
 	})
 
-	console.log(arrows.value)
-
-	console.log(nodeRefs.value)
 	nodeRefs.value.forEach((nodeRef) => {
 		if (nodeRef) nodeRef.clearAnimation()
 	})
 }
 
-const disablePopButton = computed(() => {
-	return linkedList.value.head ? false : true
-})
-
 onMounted(() => {
 	generateList()
 })
+
 let addingNode = false
 
 const clearList = () => {
 	linkedList.value = new LinkedList()
 }
 const generateList = async () => {
-	const length = Math.floor(Math.random() * 10) + 3
-	linkedList.value = new LinkedList()
-
+	clearList()
+	const length = Math.floor(Math.random() * 3) + 3
 	for (let i = 0; i < length; i++) {
 		linkedList.value.push(new Node(Math.floor(Math.random() * 100)))
-		await new Promise((resolve) => setTimeout(resolve, 200))
+		await new Promise((resolve) => setTimeout(resolve, 400))
 	}
 }
 
-watchEffect(() => {
-	nodes.value = linkedList.value.getNodes()
-})
-
 const nodeType = (index: number) => {
 	if (index === 0) return 'head'
-	if (index === nodes.value.length - 1) return 'tail'
+	if (index === linkedList.value.getNodes().length - 1) return 'tail'
 	return ''
 }
 
 const addNode = () => {
-	// if (!addingNode) {
-	// 	addingNode = true
-	// 	setTimeout(() => {
-	// 		addingNode = false
-	// 	}, 200)
-	// } else {
-	// 	return
-	// }
-
 	const node = new Node(nodeData.value)
 	linkedList.value.push(node)
-	nodes.value.push(node)
 }
 
 const randomNode = () => {
 	const node = new Node(Math.floor(Math.random() * 100))
 	linkedList.value.push(node)
-	nodes.value.push(node)
 }
 
 const popNode = () => {
 	linkedList.value.pop()
-	nodes.value.pop()
 }
 </script>
 
@@ -169,6 +130,7 @@ const popNode = () => {
 	max-width: 50%;
 	margin: 0 auto;
 	min-width: 50%;
+	position: relative;
 }
 
 .wrapper {
@@ -178,6 +140,15 @@ const popNode = () => {
 	align-items: center;
 	backface-visibility: hidden;
 	z-index: 1;
+}
+
+.btn__group {
+	display: flex;
+	padding: 10px;
+	width: max-content;
+	margin: 0 5px 0 5px;
+	background: rgba(255, 255, 255, 0.4);
+	border-radius: var(--borderRadius);
 }
 
 .node__next {
@@ -190,55 +161,36 @@ const popNode = () => {
 
 /* base */
 .listAnim {
-	backface-visibility: hidden;
 	z-index: 1;
 }
 
-/* moving */
-.listAnim-move {
-	transition: all 600ms ease-in-out 50ms;
-}
-
-/* appearing */
-.listAnim-enter-active {
-	transition: all 400ms ease-out;
-	opacity: 0;
-}
-
-/* disappearing */
+.listAnim-enter-active,
 .listAnim-leave-active {
-	transition: all 200ms ease-in;
-	position: absolute;
-	z-index: 0;
+	transition: all 400ms ease-in-out;
 }
 
-/* appear at / disappear to */
-.listAnim-enter,
+.listAnim-enter-to {
+	opacity: 1;
+}
+.listAnim-enter-from,
 .listAnim-leave-to {
 	opacity: 0;
 }
 
-.node__next-enter-active {
-	transform: translateX(100%);
-	opacity: 1;
-}
-.node__next-enter-from {
-	transform: translateX(0);
-	opacity: 0;
-}
-.node__next-enter-active {
-	position: absolute;
-}
-
-.node__next-leave {
-	transform: translateX(0);
-}
-.node__next-leave-to {
-	transform: translateX(-100%);
-}
-
 .node__next-enter-active,
 .node__next-leave-active {
-	transition: all 100ms ease-in-out;
+	transition: all 400ms ease-in-out;
+	transform-origin: left;
+}
+.node__next-enter-from {
+	transform: scaleX(0);
+}
+
+.node__next-enter-to {
+	transform: scaleX(100%);
+}
+
+.node__next-leave-to {
+	transform: scaleX(0);
 }
 </style>

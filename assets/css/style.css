@@ -22,6 +22,8 @@ html {
 	--arrowBorderWidth: 6px;
 	--cubeHeight: 0px;
 	--cubeWidth: 32px;
+
+	--borderRadius: 25px;
 }
 
 .linked-list {
